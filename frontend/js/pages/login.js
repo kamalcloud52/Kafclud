@@ -4,6 +4,12 @@ class LoginPage {
     }
 
     render() {
+        // Cek apakah sudah login
+        if (auth.isAuthenticated()) {
+            window.location.href = '/';
+            return;
+        }
+
         this.container.innerHTML = `
             <div class="login-page">
                 <div class="login-card">
@@ -58,7 +64,6 @@ class LoginPage {
                 return;
             }
 
-            // Loading state
             btn.disabled = true;
             btnText.textContent = 'Memproses...';
             spinner.style.display = 'inline-block';
@@ -69,7 +74,7 @@ class LoginPage {
                 
                 if (result.user) {
                     toast.success('Login berhasil!');
-                    window.location.href = '/?page=dashboard';
+                    window.location.href = '/';
                 } else {
                     errorEl.textContent = 'Login gagal, silahkan coba lagi';
                     errorEl.style.display = 'block';
@@ -84,7 +89,6 @@ class LoginPage {
             }
         });
 
-        // Enter key submit
         password.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 form.dispatchEvent(new Event('submit'));
@@ -93,4 +97,5 @@ class LoginPage {
     }
 }
 
+// Override login page
 window.loginPage = new LoginPage();
