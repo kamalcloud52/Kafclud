@@ -1,0 +1,72 @@
+[data-theme="dark"] {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: #334155;
+    --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-lg: 0 10px 30px rgba(0,0,0,0.4);
+    --primary-rgb: 96, 165, 250;
+}
+
+[data-theme="dark"] .login-card {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select,
+[data-theme="dark"] .form-group textarea {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .btn:not(.btn-primary):not(.btn-success):not(.btn-danger):not(.btn-warning) {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .file-card {
+    background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .file-list-item:hover {
+    background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .modal {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] #context-menu {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .user-dropdown {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .pdf-viewer-container {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .video-player-container {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .music-player-bar {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .sidebar {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .navbar {
+    background: var(--bg-primary);
+}
+
+[data-theme="dark"] .login-page {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
