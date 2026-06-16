@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kafa Cloud</title>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- PDF.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf_viewer.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/dark.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/player.css">
+</head>
+<body>
+    <!-- Cloudflare Pages akan inject environment variable ke sini -->
+    <script>
+        // AMBIL dari environment variable Cloudflare Pages
+        // TIDAK ADA HARDCODE URL!
+        window.API_BASE_URL = '{{VITE_API_BASE}}';
+        
+        // Fallback untuk development local
+        if (!window.API_BASE_URL || window.API_BASE_URL === '{{VITE_API_BASE}}') {
+            window.API_BASE_URL = 'http://localhost:3000/api';
+        }
+    </script>
+
+    <div id="app">
+        <!-- Toast Container -->
+        <div id="toast-container"></div>
+        
+        <!-- Modal Container -->
+        <div id="modal-container"></div>
+        
+        <!-- Context Menu -->
+        <div id="context-menu"></div>
+        
+        <!-- Main App -->
+        <div id="app-container">
+            <!-- Navbar -->
+            <nav id="navbar" class="navbar">
+                <div class="navbar-left">
+                    <button id="sidebar-toggle" class="nav-btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <a href="#" class="navbar-brand" data-page="dashboard">
+                        <i class="fas fa-cloud"></i>
+                        Kafa Cloud
+                    </a>
+                </div>
+                <div class="navbar-center">
+                    <div class="search-bar-nav">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="global-search" placeholder="Cari file..." />
+                    </div>
+                </div>
+                <div class="navbar-right">
+                    <button id="theme-toggle" class="nav-btn" title="Toggle Theme">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-menu" id="user-menu">
+                        <div class="user-avatar" id="user-avatar">A</div>
+                        <span class="username" id="username-display">Admin</span>
+                        <i class="fas fa-chevron-down"></i>
+                        <div class="user-dropdown" id="user-dropdown">
+                            <a href="#" data-page="settings"><i class="fas fa-cog"></i> Settings</a>
+                            <a href="#" data-page="admin" id="admin-menu-item"><i class="fas fa-users-cog"></i> Admin</a>
+                            <hr>
+                            <a href="#" id="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar">
+                <div class="sidebar-overlay" id="sidebar-overlay"></div>
+                <div class="sidebar-nav">
+                    <a href="#" class="sidebar-item active" data-page="dashboard">
+                        <i class="fas fa-chart-pie"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#" class="sidebar-item" data-page="files">
+                        <i class="fas fa-folder"></i>
+                        <span>File Manager</span>
+                    </a>
+                    <a href="#" class="sidebar-item" data-page="gallery">
+                        <i class="fas fa-images"></i>
+                        <span>Gallery</span>
+                    </a>
+                    <a href="#" class="sidebar-item" data-page="video">
+                        <i class="fas fa-film"></i>
+                        <span>Video Center</span>
+                    </a>
+                    <a href="#" class="sidebar-item" data-page="music">
+                        <i class="fas fa-music"></i>
+                        <span>Music Center</span>
+                    </a>
+                    <a href="#" class="sidebar-item" data-page="favorites">
+                        <i class="fas fa-star"></i>
+                        <span>Favorites</span>
+                    </a>
+                    <a href="#" class="sidebar-item" data-page="recent">
+                        <i class="fas fa-clock"></i>
+                        <span>Recent</span>
+                    </a>
+                    <hr>
+                    <a href="#" class="sidebar-item" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>Settings</span>
+                    </a>
+                </div>
+            </aside>
+            
+            <!-- Main Content -->
+            <main id="page-content">
+                <!-- Pages will be rendered here -->
+            </main>
+        </div>
+        
+        <!-- PDF Viewer Overlay -->
+        <div id="pdf-viewer" class="pdf-viewer-overlay" style="display:none;">
+            <div class="pdf-viewer-container">
+                <div class="pdf-toolbar">
+                    <button id="pdf-close"><i class="fas fa-times"></i></button>
+                    <span id="pdf-title">PDF Viewer</span>
+                    <div class="pdf-controls">
+                        <button id="pdf-prev"><i class="fas fa-chevron-left"></i></button>
+                        <span id="pdf-page-info">1 / 1</span>
+                        <button id="pdf-next"><i class="fas fa-chevron-right"></i></button>
+                        <input type="range" id="pdf-zoom" min="50" max="200" value="100">
+                        <span id="pdf-zoom-label">100%</span>
+                        <button id="pdf-fullscreen"><i class="fas fa-expand"></i></button>
+                    </div>
+                </div>
+                <div id="pdf-canvas-container">
+                    <canvas id="pdf-canvas"></canvas>
+                </div>
+                <div id="pdf-search-container">
+                    <input type="text" id="pdf-search-input" placeholder="Cari dalam PDF..." />
+                    <button id="pdf-search-prev"><i class="fas fa-chevron-up"></i></button>
+                    <button id="pdf-search-next"><i class="fas fa-chevron-down"></i></button>
+                    <span id="pdf-search-count"></span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Video Player Overlay -->
+        <div id="video-player" class="video-player-overlay" style="display:none;">
+            <div class="video-player-container">
+                <div class="video-toolbar">
+                    <button id="video-close"><i class="fas fa-times"></i></button>
+                    <span id="video-title">Video Player</span>
+                </div>
+                <video id="video-element" controls></video>
+                <div class="video-controls-custom">
+                    <button id="video-play"><i class="fas fa-play"></i></button>
+                    <span id="video-time">00:00 / 00:00</span>
+                    <input type="range" id="video-progress" min="0" max="100" value="0" />
+                    <button id="video-volume"><i class="fas fa-volume-up"></i></button>
+                    <input type="range" id="video-volume-slider" min="0" max="100" value="100" />
+                    <button id="video-speed">1x</button>
+                    <button id="video-fullscreen"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Music Player -->
+        <div id="music-player" class="music-player-bar" style="display:none;">
+            <div class="music-player-content">
+                <div class="music-info">
+                    <span id="music-title">No track</span>
+                    <span id="music-artist">-</span>
+                </div>
+                <div class="music-controls">
+                    <button id="music-shuffle"><i class="fas fa-random"></i></button>
+                    <button id="music-prev"><i class="fas fa-step-backward"></i></button>
+                    <button id="music-play-btn"><i class="fas fa-play"></i></button>
+                    <button id="music-next"><i class="fas fa-step-forward"></i></button>
+                    <button id="music-repeat"><i class="fas fa-repeat"></i></button>
+                </div>
+                <div class="music-progress">
+                    <span id="music-current-time">00:00</span>
+                    <input type="range" id="music-progress-slider" min="0" max="100" value="0" />
+                    <span id="music-duration">00:00</span>
+                </div>
+                <div class="music-volume">
+                    <i class="fas fa-volume-up"></i>
+                    <input type="range" id="music-volume-slider" min="0" max="100" value="80" />
+                </div>
+                <button id="music-playlist-toggle"><i class="fas fa-list"></i></button>
+            </div>
+            <div id="music-playlist" class="music-playlist" style="display:none;">
+                <div class="playlist-header">
+                    <span>Playlist</span>
+                    <button id="playlist-clear"><i class="fas fa-trash"></i></button>
+                </div>
+                <div id="playlist-items"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/utils/constants.js"></script>
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/services/api.js"></script>
+    <script src="js/services/auth.js"></script>
+    <script src="js/services/storage.js"></script>
+    <script src="js/services/eventBus.js"></script>
+    
+    <script src="js/components/toast.js"></script>
+    <script src="js/components/modal.js"></script>
+    <script src="js/components/contextMenu.js"></script>
+    <script src="js/components/navbar.js"></script>
+    <script src="js/components/sidebar.js"></script>
+    <script src="js/components/breadcrumb.js"></script>
+    <script src="js/components/fileList.js"></script>
+    <script src="js/components/fileGrid.js"></script>
+    <script src="js/components/upload.js"></script>
+    <script src="js/components/player.js"></script>
+    <script src="js/components/pdfViewer.js"></script>
+    
+    <script src="js/pages/dashboard.js"></script>
+    <script src="js/pages/files.js"></script>
+    <script src="js/pages/gallery.js"></script>
+    <script src="js/pages/video.js"></script>
+    <script src="js/pages/music.js"></script>
+    <script src="js/pages/favorites.js"></script>
+    <script src="js/pages/recent.js"></script>
+    <script src="js/pages/search.js"></script>
+    <script src="js/pages/admin.js"></script>
+    <script src="js/pages/settings.js"></script>
+    <script src="js/pages/login.js"></script>
+    
+    <script src="js/app.js"></script>
+</body>
+</html>
