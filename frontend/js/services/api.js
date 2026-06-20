@@ -200,10 +200,10 @@ class ApiService {
         return `${this.baseUrl}/media/audio?path=${encodeURIComponent(path)}&token=${token}`;
     }
 
-    getThumbnailUrl(path) {
-        const token = this.getToken();
-        return `${this.baseUrl}/media/thumbnail/${encodeURIComponent(path)}?token=${token}`;
-    }
+   getThumbnailUrl(path) {
+    const token = this.getToken();
+    return `${this.baseUrl}/media/thumbnail?path=${encodeURIComponent(path)}&token=${token}`;
+   }
 
     // User
     async getProfile() {
